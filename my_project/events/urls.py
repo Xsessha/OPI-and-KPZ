@@ -7,6 +7,8 @@ urlpatterns = [
     path('create/', views.create_event, name='create_event'),
     path('join/', views.join_event, name='join_event'),
 
-    path('draw/<uuid:event_id>/', views.run_draw, name='run_draw'),
-    path('assignment/<uuid:event_id>/', views.my_assignment, name='assignment'),
+    path('wishlist/<uuid:event_id>/', views.wishlist, name='wishlist'),
+
+    path('draw/<uuid:event_id>/', views.run_draw_view, name='draw'),
+    path('assignment/<uuid:event_id>/', views.assignment, name='assignment'),
 ]

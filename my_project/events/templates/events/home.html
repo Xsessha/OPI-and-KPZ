@@ -1,12 +1,18 @@
 <h1>Events</h1>
 
-<a href="/create/">Create Event</a>
-<a href="/join/">Join Event</a>
+<a href="/create/">Create</a>
+<a href="/join/">Join</a>
 
 {% for e in events %}
     <div>
-        <p>{{ e.title }}</p>
-        <a href="/draw/{{ e.id }}/">Run Draw</a>
-        <a href="/assignment/{{ e.id }}/">My Target</a>
+        <b>{{ e.title }}</b>
+
+        <a href="/wishlist/{{ e.id }}/">Wishlist</a>
+
+        {% if not e.is_drawn %}
+            <a href="/draw/{{ e.id }}/">Run Draw</a>
+        {% else %}
+            <a href="/assignment/{{ e.id }}/">My Target</a>
+        {% endif %}
     </div>
 {% endfor %}

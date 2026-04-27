@@ -1,39 +1,35 @@
 import random
-from .models import Event, Assignment, EventParticipant
+from .models import EventParticipant, Assignment, Event
 
-def run_secret_santa(event_id):
-    event = Event.objects.get(id=event_id)
-
+def run_draw(event):
     participants = list(
         EventParticipant.objects.filter(event=event).values_list('user', flat=True)
     )
 
     if len(participants) < 3:
-        raise Exception("Minimum 3 participants required")
+        raise Exception("Minimum 3 users required")
 
-    receivers = participants.copy()
+    while True:
+        shuffled = participants.copy()
+        random.shuffle(shuffled)
 
-    success = False
-
-    while not success:
-        random.shuffle(receivers)
-        success = True
-
-        for giver, receiver in zip(participants, receivers):
-            if giver == receiver:
-                success = False
+        valid = True
+        for g, r in zip(participants, shuffled):
+            if g == r:
+                valid = False
                 break
 
-    # очищаємо старі призначення
+        if valid:
+            break
+
     Assignment.objects.filter(event=event).delete()
 
-    # створюємо нові
-    for giver, receiver in zip(participants, receivers):
+    for g, r in zip(participants, shuffled):
         Assignment.objects.create(
             event=event,
-            giver_id=giver,
-            receiver_id=receiver
+            giver_id=g,
+            receiver_id=r
         )
 
-    event.status = 'DRAWN'
+    event.is_drawn = True
     event.save()
