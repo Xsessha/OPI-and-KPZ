@@ -1,0 +1,12 @@
+<h1>Events</h1>
+
+<a href="/create/">Create Event</a>
+<a href="/join/">Join Event</a>
+
+{% for e in events %}
+    <div>
+        <p>{{ e.title }}</p>
+        <a href="/draw/{{ e.id }}/">Run Draw</a>
+        <a href="/assignment/{{ e.id }}/">My Target</a>
+    </div>
+{% endfor %}

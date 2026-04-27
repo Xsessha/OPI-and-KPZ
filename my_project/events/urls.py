@@ -1,0 +1,12 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+
+    path('create/', views.create_event, name='create_event'),
+    path('join/', views.join_event, name='join_event'),
+
+    path('draw/<uuid:event_id>/', views.run_draw, name='run_draw'),
+    path('assignment/<uuid:event_id>/', views.my_assignment, name='assignment'),
+]
