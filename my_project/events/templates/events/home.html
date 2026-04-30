@@ -25,6 +25,13 @@
                 <span>👥 {{ event.participant_count }} participant{% if event.participant_count != 1 %}s{% endif %}</span>
                 <span>📅 {{ event.exchange_date|date:'M j, Y \a\t H:i' }}</span>
             </div>
+            {% if event.participant_count > 1 %}
+            <div class="participant-list">
+                {% for participant in event.eventparticipant_set.all %}
+                    <span class="participant-chip">{{ participant.user.username|default:participant.user.email }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="event-actions">
                 {% if event.has_wishlist %}
                     <a class="button-secondary" href="{% url 'wishlist' event.id %}">Edit wishlist</a>

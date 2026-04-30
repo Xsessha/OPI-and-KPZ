@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, OuterRef, Prefetch
 
 from .models import Event, EventParticipant, Wishlist, Assignment
 from .forms import UserRegistrationForm, EventForm, WishlistForm
@@ -35,6 +35,9 @@ def home(request):
             has_wishlist=Exists(wishlist_exists),
             has_assignment=Exists(assignment_exists)
         )
+        .prefetch_related(
+            Prefetch('eventparticipant_set', queryset=EventParticipant.objects.select_related('user'))
+        )
         .order_by('exchange_date')
     )
 
@@ -59,7 +62,11 @@ def create_event(request):
 @login_required
 def join_event(request):
     if request.method == 'POST':
-        code = request.POST.get('code')
+        code = request.POST.get('code', '').strip().upper()
+        if not code:
+            messages.error(request, 'Enter the event code to join.')
+            return redirect('join_event')
+
         try:
             event = Event.objects.get(join_code=code)
             EventParticipant.objects.get_or_create(event=event, user=request.user)
