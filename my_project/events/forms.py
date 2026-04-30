@@ -1,26 +1,68 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User, Event, Wishlist
 
-# Форма реєстрації спеціально для твого User
 class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'you@domain.com'
+        })
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Your display name'
+        })
+    )
+
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ("email", "username") # email обов'язковий, бо він головний у тебе
+        fields = ("email", "username", "password1", "password2")
+
+class EmailAuthenticationForm(AuthenticationForm):
+    username = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Email address'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'input-field',
+            'placeholder': 'Password'
+        })
+    )
 
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'budget', 'exchange_date'] 
+        fields = ['title', 'budget', 'exchange_date']
         widgets = {
-            'exchange_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'title': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'Holiday gift exchange'
+            }),
+            'budget': forms.TextInput(attrs={
+                'class': 'input-field',
+                'placeholder': 'For example: $30 - $40'
+            }),
+            'exchange_date': forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'class': 'input-field'
+            }),
         }
 
 class WishlistForm(forms.ModelForm):
-    # У твоїй моделі Wishlist не було поля 'wish_text', 
-    # але воно було у WishlistItem. 
-    # Якщо хочеш просте поле, додай 'wish_text' у модель Wishlist.
-    wish_text = forms.CharField(widget=forms.Textarea, label="Твої побажання")
+    wish_text = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'input-field',
+            'placeholder': 'Tell your Secret Santa what makes your heart happy...',
+            'rows': 5
+        }),
+        label="Your wishlist"
+    )
 
     class Meta:
         model = Wishlist

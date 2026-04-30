@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid
+import random
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,6 +23,19 @@ class Event(models.Model):
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
 
     is_drawn = models.BooleanField(default=False)
+
+    @staticmethod
+    def generate_join_code(length=6):
+        letters = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+        code = ''.join(random.choice(letters) for _ in range(length))
+        while Event.objects.filter(join_code=code).exists():
+            code = ''.join(random.choice(letters) for _ in range(length))
+        return code
+
+    def save(self, *args, **kwargs):
+        if not self.join_code:
+            self.join_code = self.generate_join_code()
+        super().save(*args, **kwargs)
 
 
 class EventParticipant(models.Model):

@@ -1,6 +1,43 @@
-<h2>You give gift to:</h2>
+{% extends 'events/base.html' %}
 
-<p>{{ assignment.receiver.username }}</p>
+{% block title %}Assignment | PleaseNoSocks{% endblock %}
 
-<h3>Wishlist:</h3>
-<p>{{ wishlist.wish_text }}</p>
+{% block content %}
+<div class="grid-2">
+    <section class="card event-card">
+        <div class="card-content">
+            <div class="card-tag">Assignment card</div>
+            <h1 class="card-title">You are gifting to</h1>
+            <p class="tagline">Keep this name secret — your mission is to delight them anonymously.</p>
+            <div class="event-metadata">
+                <span>🎁 Receiver: <strong>{{ assignment.receiver.username }}</strong></span>
+                <span>📅 Event: {{ assignment.event.title }}</span>
+            </div>
+            {% if assignment.is_gift_sent %}
+                <span class="chip" style="background: rgba(37, 199, 141, 0.12); color: #186442;">Gift marked as sent</span>
+            {% else %}
+                <span class="chip">Gift not marked sent yet</span>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="form-card">
+        <div class="status-pill">Wishlist preview</div>
+        {% if wishlist %}
+            <p class="tagline">A thoughtful summary of what your Secret Santa should know.</p>
+            <div style="padding: 20px; border-radius: 24px; background: var(--surface-soft); border: 1px solid rgba(140,108,255,0.14);">
+                <p style="margin:0; white-space: pre-line; color: var(--text);">{{ wishlist.wish_text }}</p>
+            </div>
+        {% else %}
+            <p class="tagline">No wishlist has been shared yet.</p>
+        {% endif %}
+
+        {% if not assignment.is_gift_sent %}
+        <form method="post" action="{% url 'mark_gift_sent' assignment.event.id %}" data-loading style="margin-top: 22px;">
+            {% csrf_token %}
+            <button type="submit" class="button">Mark gift as sent</button>
+        </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

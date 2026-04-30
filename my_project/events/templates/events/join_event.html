@@ -1,7 +1,18 @@
-<h2>Join Event</h2>
+{% extends 'events/base.html' %}
 
-<form method="post">
-    {% csrf_token %}
-    <input name="code" placeholder="Enter code">
-    <button>Join</button>
-</form>
+{% block title %}Join Event | PleaseNoSocks{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width:520px; margin: 0 auto;">
+    <div class="panel">
+        <p class="status-pill">Join with code</p>
+        <h1 class="page-title">Enter your event code</h1>
+        <p class="page-subtitle">Paste the invitation code from your organizer to join the gift circle.</p>
+        <form method="post" data-loading class="field-group">
+            {% csrf_token %}
+            <input type="text" name="code" class="input-field" placeholder="Enter code" required>
+            <button type="submit" class="button">Join event</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

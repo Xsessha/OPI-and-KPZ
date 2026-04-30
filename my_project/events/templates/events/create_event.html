@@ -1,7 +1,23 @@
-<h2>Create Event</h2>
+{% extends 'events/base.html' %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button>Create</button>
-</form>
+{% block title %}Create Event | PleaseNoSocks{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+    <section class="panel">
+        <p class="status-pill">Organizer mode</p>
+        <h1 class="page-title">Create your next giveaway</h1>
+        <p class="page-subtitle">Set a date, define a budget, and launch a Secret Santa event that feels polished and playful.</p>
+        <div class="tagline">Every event retains anonymity, avoids duplicates, and keeps the joy in the gift exchange.</div>
+    </section>
+
+    <section class="form-card">
+        <form method="post" data-loading class="field-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Create event</button>
+        </form>
+        <p class="small-text">When the event is created, a unique invite code will be generated automatically for your group.</p>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PleaseNoSocks | Secret Santa{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'events/styles.css' %}">
+    <script defer src="{% static 'events/scripts.js' %}"></script>
+</head>
+<body>
+<div class="app-shell">
+    <header class="topbar">
+        <div class="brand-panel">
+            <div class="brand-mark">🎁</div>
+            <div>
+                <p class="brand-title">PleaseNoSocks</p>
+                <p class="brand-subtitle">Secret gifting for modern teams.</p>
+            </div>
+        </div>
+        <nav class="nav-links">
+            {% if user.is_authenticated %}
+                <span class="nav-user">Hi, {{ user.username|default:user.email }}</span>
+                <a href="{% url 'home' %}">Dashboard</a>
+                <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="button-secondary">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="page-content">
+        {% if messages %}
+            <div class="toast-stack">
+                {% for message in messages %}
+                    <div class="toast toast-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+</body>
+</html>

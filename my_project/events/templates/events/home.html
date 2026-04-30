@@ -1,18 +1,60 @@
-<h1>Events</h1>
+{% extends 'events/base.html' %}
 
-<a href="/create/">Create</a>
-<a href="/join/">Join</a>
+{% block title %}Dashboard | PleaseNoSocks{% endblock %}
 
-{% for e in events %}
-    <div>
-        <b>{{ e.title }}</b>
-
-        <a href="/wishlist/{{ e.id }}/">Wishlist</a>
-
-        {% if not e.is_drawn %}
-            <a href="/draw/{{ e.id }}/">Run Draw</a>
-        {% else %}
-            <a href="/assignment/{{ e.id }}/">My Target</a>
-        {% endif %}
+{% block content %}
+<section class="panel hero-card">
+    <p class="status-pill">Your secret gift dashboard</p>
+    <h1 class="page-title">Your gift circle is waiting.</h1>
+    <p class="page-subtitle">Create or join an event, add your wishlist, and preserve the surprise until the big day.</p>
+    <div class="form-actions" style="margin-top: 24px; gap: 16px;">
+        <a href="{% url 'create_event' %}" class="button">Create event</a>
+        <a href="{% url 'join_event' %}" class="button-secondary">Join with code</a>
     </div>
-{% endfor %}
+</section>
+
+{% if events %}
+<div class="event-grid">
+    {% for event in events %}
+    <article class="card event-card">
+        <div class="card-content">
+            <div class="card-tag">{% if event.is_drawn %}Draw complete{% else %}Waiting for wishes{% endif %}</div>
+            <h2 class="card-title">{{ event.title }}</h2>
+            <div class="event-metadata">
+                <span>🎟 {{ event.join_code }}</span>
+                <span>👥 {{ event.participant_count }} participant{% if event.participant_count != 1 %}s{% endif %}</span>
+                <span>📅 {{ event.exchange_date|date:'M j, Y \a\t H:i' }}</span>
+            </div>
+            <div class="event-actions">
+                {% if event.has_wishlist %}
+                    <a class="button-secondary" href="{% url 'wishlist' event.id %}">Edit wishlist</a>
+                {% else %}
+                    <a class="button" href="{% url 'wishlist' event.id %}">Add wishlist</a>
+                {% endif %}
+                {% if event.is_drawn %}
+                    <a class="button-secondary" href="{% url 'assignment' event.id %}">See assignment</a>
+                {% elif user == event.organizer %}
+                    {% if event.participant_count >= 3 %}
+                        <a class="button" href="{% url 'draw' event.id %}">Run draw</a>
+                    {% else %}
+                        <span class="chip">Need at least 3 participants</span>
+                    {% endif %}
+                {% else %}
+                    <span class="chip">Waiting for organizer</span>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h2>No events yet 🎄</h2>
+    <p>Start your first holiday exchange or join an existing event with a code.</p>
+    <div class="form-actions" style="justify-content:center; margin-top: 24px;">
+        <a href="{% url 'create_event' %}" class="button">Create event</a>
+        <a href="{% url 'join_event' %}" class="button-secondary">Join event</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Реєстрація - Secret Santa</title>
-</head>
-<body>
-    <h2>Створити акаунт</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Зареєструватися</button>
-    </form>
-    <p>Вже маєте акаунт? <a href="{% url 'login' %}">Увійти тут</a></p>
-</body>
-</html>
+{% extends 'events/base.html' %}
+
+{% block title %}Register | PleaseNoSocks{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width:540px; margin: 0 auto;">
+    <div class="panel">
+        <p class="status-pill">New account</p>
+        <h1 class="page-title">Create your PleaseNoSocks profile</h1>
+        <p class="page-subtitle">Start building joyful wishlists and host clean Secret Santa events.</p>
+        <form method="POST" data-loading class="field-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Create account</button>
+        </form>
+        <p class="small-text">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+</div>
+{% endblock %}

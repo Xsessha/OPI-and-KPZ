@@ -11,4 +11,5 @@ urlpatterns = [
 
     path('draw/<uuid:event_id>/', views.run_draw_view, name='draw'),
     path('assignment/<uuid:event_id>/', views.assignment, name='assignment'),
+    path('assignment/<uuid:event_id>/sent/', views.mark_gift_sent, name='mark_gift_sent'),
 ]

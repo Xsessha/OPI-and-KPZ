@@ -1,7 +1,34 @@
-<h2>Wishlist</h2>
+{% extends 'events/base.html' %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button>Save</button>
-</form>
+{% block title %}Wishlist | PleaseNoSocks{% endblock %}
+
+{% block content %}
+<div class="grid-2">
+    <section class="profile-card">
+        <div style="display:flex; gap:18px; align-items:center;">
+            <div class="profile-avatar">💌</div>
+            <div>
+                <p class="status-pill">Wishlist profile</p>
+                <h1 class="page-title">Share your holiday vibes</h1>
+                <p class="tagline">Make your Secret Santa smile with a personal and playful wishlist card.</p>
+            </div>
+        </div>
+        <p class="small-text">Use one of the suggestions or write a few lines that feel like you. Keep it warm, expressive, and gift-ready.</p>
+        <div class="chip-list">
+            {% for suggestion in suggestions %}
+                <button type="button" class="suggestion-chip" data-suggestion="{{ suggestion }}">{{ suggestion }}</button>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="form-card">
+        <p class="status-pill">Event: {{ event.title }}</p>
+        <form method="post" data-loading class="field-group">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button">Save wishlist</button>
+        </form>
+        <p class="small-text">This wishlist is visible only to your Secret Santa after the draw — no spoilers, just wishes.</p>
+    </section>
+</div>
+{% endblock %}
