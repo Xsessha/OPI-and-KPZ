@@ -17,4 +17,26 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
+
+  // Auto-refresh page on home/dashboard to show updated participant counts
+  if (document.querySelector('.event-grid') || document.querySelector('.empty-state')) {
+    let refreshInterval;
+    const startAutoRefresh = () => {
+      clearInterval(refreshInterval);
+      refreshInterval = setInterval(() => {
+        location.reload();
+      }, 3000); // Refresh every 3 seconds
+    };
+
+    // Handle visibility change - refresh when returning to tab
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        clearInterval(refreshInterval);
+      } else {
+        location.reload();
+      }
+    });
+
+    startAutoRefresh();
+  }
 });

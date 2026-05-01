@@ -20,9 +20,13 @@ class Event(models.Model):
 
     join_code = models.CharField(max_length=10, unique=True, default='')
 
-    organizer = models.ForeignKey(User, on_delete=models.CASCADE)
+    organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events')
 
     is_drawn = models.BooleanField(default=False)
+    
+    def is_organizer(self, user):
+        """Check if a user is the organizer of this event"""
+        return user and self.organizer_id == user.id
 
     @staticmethod
     def generate_join_code(length=6):

@@ -22,16 +22,18 @@
             <h2 class="card-title">{{ event.title }}</h2>
             <div class="event-metadata">
                 <span>🎟 {{ event.join_code }}</span>
+                <span>� Organizer: <strong>{{ event.organizer.username|default:event.organizer.email }}</strong></span>
                 <span>👥 {{ event.participant_count }} participant{% if event.participant_count != 1 %}s{% endif %}</span>
                 <span>📅 {{ event.exchange_date|date:'M j, Y \a\t H:i' }}</span>
             </div>
-            {% if event.participant_count > 1 %}
             <div class="participant-list">
+                <strong>Participants:</strong>
                 {% for participant in event.eventparticipant_set.all %}
-                    <span class="participant-chip">{{ participant.user.username|default:participant.user.email }}</span>
+                    <span class="participant-chip">{{ participant.user.username|default:participant.user.email }}{% if participant.user.id == event.organizer.id %} 🔑{% endif %}</span>
+                {% empty %}
+                    <span class="participant-chip">No participants yet</span>
                 {% endfor %}
             </div>
-            {% endif %}
             <div class="event-actions">
                 {% if event.has_wishlist %}
                     <a class="button-secondary" href="{% url 'wishlist' event.id %}">Edit wishlist</a>
@@ -42,12 +44,12 @@
                     <a class="button-secondary" href="{% url 'assignment' event.id %}">See assignment</a>
                 {% elif user == event.organizer %}
                     {% if event.participant_count >= 3 %}
-                        <a class="button" href="{% url 'draw' event.id %}">Run draw</a>
+                        <a class="button" href="{% url 'draw' event.id %}">🎲 Run the draw</a>
                     {% else %}
-                        <span class="chip">Need at least 3 participants</span>
+                        <span class="chip">⏳ Wait for more people to join</span>
                     {% endif %}
                 {% else %}
-                    <span class="chip">Waiting for organizer</span>
+                    <span class="chip">⏳ Waiting for organizer to run draw</span>
                 {% endif %}
             </div>
         </div>

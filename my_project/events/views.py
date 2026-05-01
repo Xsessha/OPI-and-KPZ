@@ -24,11 +24,15 @@ def register(request):
 
 @login_required
 def home(request):
+    from django.db.models import Q
+    
     wishlist_exists = Wishlist.objects.filter(user=request.user, event=OuterRef('pk'))
     assignment_exists = Assignment.objects.filter(event=OuterRef('pk'), giver=request.user)
 
+    # Show events where user is a participant OR organizer
     events = (
-        Event.objects.filter(eventparticipant__user=request.user)
+        Event.objects.filter(Q(eventparticipant__user=request.user) | Q(organizer=request.user))
+        .select_related('organizer')
         .distinct()
         .annotate(
             participant_count=Count('eventparticipant'),
@@ -50,10 +54,11 @@ def create_event(request):
 
     if form.is_valid():
         event = form.save(commit=False)
-        event.organizer = request.user
+        event.organizer = request.user  # Set the creator as organizer
         event.save()
-        EventParticipant.objects.create(event=event, user=request.user)
-        messages.success(request, f'Event created. Share the invite code {event.join_code} with your group!')
+        # Add the organizer as a participant (use get_or_create to avoid duplicates)
+        EventParticipant.objects.get_or_create(event=event, user=request.user)
+        messages.success(request, f'Event "{event.title}" created! Share code {event.join_code} with your group.')
         return redirect('home')
 
     return render(request, 'events/create_event.html', {'form': form})
@@ -69,8 +74,11 @@ def join_event(request):
 
         try:
             event = Event.objects.get(join_code=code)
-            EventParticipant.objects.get_or_create(event=event, user=request.user)
-            messages.success(request, f'Joined {event.title}. Add your wishlist to help your Secret Santa.')
+            participant, created = EventParticipant.objects.get_or_create(event=event, user=request.user)
+            if created:
+                messages.success(request, f'✅ Joined {event.title}! Add your wishlist to help your Secret Santa.')
+            else:
+                messages.info(request, f'You are already a participant in {event.title}.')
             return redirect('home')
         except Event.DoesNotExist:
             messages.error(request, 'That code does not match any event. Double-check and try again.')
@@ -105,18 +113,14 @@ def wishlist(request, event_id):
 
 @login_required
 def run_draw_view(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-
-    if request.user != event.organizer:
-        messages.error(request, 'Only the organizer can run the draw.')
-        return redirect('home')
+    event = get_object_or_404(Event, id=event_id, organizer=request.user)
 
     try:
         run_draw(event)
-        messages.success(request, 'The draw is complete. Assignments are ready!')
+        messages.success(request, 'The draw is complete! Everyone has their assignment. 🎁')
     except Exception as exc:
-        messages.error(request, str(exc))
-
+        messages.error(request, f'Draw failed: {str(exc)}')
+    
     return redirect('home')
 
 
